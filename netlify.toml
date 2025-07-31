@@ -4,9 +4,10 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  # Variables críticas para el build
-  PUBLIC_SUPABASE_URL = ""
-  PUBLIC_SUPABASE_ANON_KEY = ""
+  
+  # ✅ CONFIGURAR ESTAS EN NETLIFY DASHBOARD
+  # PUBLIC_SUPABASE_URL = "https://tu-proyecto.supabase.co"
+  # PUBLIC_SUPABASE_ANON_KEY = "eyJ..."
 
 # Redirects para tus rutas específicas de Kamasex
 [[redirects]]
@@ -19,7 +20,7 @@
   to = "/categoria/:categoria"
   status = 200
 
-# API routes (si tienes)
+# API routes
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
@@ -33,7 +34,7 @@
 
 [[redirects]]
   from = "/checkout"
-  to = "/checkout/index.html"  
+  to = "/checkout/index.html"
   status = 200
 
 [[redirects]]
