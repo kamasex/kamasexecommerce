@@ -1,0 +1,29 @@
+---
+// src/components/astro/FeaturedProductsSection.astro
+import type { Product } from '../../lib/types';
+import { UnifiedProductGrid } from '../react/ProductGrid';
+
+
+export interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+---
+
+<!-- Productos Destacados Section -->
+{products.length > 0 && (
+  <UnifiedProductGrid
+    products={products}
+    variant="featured"
+    title="Productos Destacados"
+    subtitle="Descubre nuestra selección premium de productos más populares para tu bienestar íntimo"
+    showFilters={false}
+    showSearch={false}
+    showSort={false}
+    showPagination={false}
+    columns={{ mobile: 1, tablet: 2, desktop: 4 }}
+    client:load
+  />
+)}
+

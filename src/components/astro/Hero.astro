@@ -1,0 +1,80 @@
+---
+// src/components/astro/Hero.astro
+---
+
+<!-- Hero Section con Logo SVG -->
+<section class="min-h-screen flex items-center justify-center bg-gray-50">
+  <div class="text-center space-y-8 max-w-2xl mx-auto px-4">
+    
+    <!-- Logo SVG Principal -->
+    <div class="space-y-6">
+      <div class="flex justify-center">
+        <img 
+          src="/images/logo-kama.svg" 
+          alt="Kamasex.shop" 
+          class="h-16 md:h-60 w-auto"
+          width="200"
+          height="80"
+        />
+      </div>
+      
+      <!-- Título con Logo -->
+      <div class="space-y-4">
+        <div class="w-24 h-px bg-gray-400 mx-auto"></div>
+      </div>
+      
+      <!-- Subtítulo -->
+      <p class="text-xl md:text-2xl font-light text-gray-600 leading-relaxed">
+        Bienestar íntimo para la mujer moderna
+      </p>
+      
+      <!-- Descripción -->
+      <p class="text-gray-500 max-w-lg mx-auto leading-relaxed">
+        Productos cuidadosamente seleccionados para tu bienestar, confianza y privacidad. 
+        Calidad premium con envío discreto.
+      </p>
+
+      <!-- CTA Button -->
+      <div class="pt-6">
+        <a 
+          href="/productos"
+          class="inline-flex items-center space-x-2 bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+        >
+          <span>Explorar Productos</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Features -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto pt-8">
+        
+        <!-- Secure Connection -->
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+          </svg>
+          <span>Conexión 100% Segura</span>
+        </div>
+        
+        <!-- Discrete Shipping -->
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+            <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707L16 7.586A1 1 0 0015.414 7H14z"></path>
+          </svg>
+          <span>Envío Discreto</span>
+        </div>
+        
+        <!-- Privacy -->
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+          </svg>
+          <span>Máxima Privacidad</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,25 +1,18 @@
-// astro.config.mjs - CONFIGURACIÓN ESTÁTICA CORREGIDA
+// astro.config.mjs - MODO ESTÁTICO PARA NETLIFY
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import react from '@astrojs/react';
 
 export default defineConfig({
   integrations: [
-    tailwind({
-      applyBaseStyles: true
-    }),
+    tailwind({ applyBaseStyles: true }),
     react()
   ],
   
-  // ✅ CAMBIO: De 'server' a 'static' para Netlify
-  output: 'static',
+  output: 'static',  // ✅ Estático para Netlify
+  // adapter: node(),  // ✅ Comentado
   
   site: 'https://kamasex.shop',
-  base: '/',
-  trailingSlash: 'ignore',
-  build: {
-    assets: 'assets'
-  },
   vite: {
     optimizeDeps: {
       include: ['@supabase/supabase-js']

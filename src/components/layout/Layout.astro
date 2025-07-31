@@ -1,7 +1,8 @@
 ---
-// src/components/layout/Layout.astro - LAYOUT CON TYPESCRIPT CORREGIDO
+// src/components/layout/Layout.astro - LAYOUT HÍBRIDO A+B
 import Header from './Header.astro';
 import Footer from './Footer.astro';
+import { GlobalCart } from '../react/Cart';
 
 export interface Props {
   title: string;
@@ -12,7 +13,7 @@ export interface Props {
 
 const { 
   title, 
-  description = "Kamasex.shop - Productos premium para el bienestar íntimo femenino", 
+  description = "Kamasex.shop - Productos de bienestar íntimo para la mujer moderna. Calidad premium y envío discreto.", 
   image = "/images/og-default.jpg",
   noIndex = false 
 } = Astro.props;
@@ -52,6 +53,165 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   
+  <!-- 🚀 SOLUCIÓN A: CART.JS EN HEAD - MÁXIMA PRIORIDAD -->
+  <script src="/js/cart.js" is:inline></script>
+  
+  <!-- 🚀 SOLUCIÓN B: EVENT SYSTEM - DESPUÉS DE CART.JS -->
+  <script is:inline>
+    // 🎯 SISTEMA DE EVENTOS HÍBRIDO - GARANTIZA DISPONIBILIDAD
+    (function() {
+      console.log('🌸 Kamasex.shop - Iniciando sistema híbrido...');
+
+      
+      // Flag para evitar múltiples ejecuciones
+if (window.KAMASEX_EVENT_SYSTEM_LOADED) {
+          console.log('🔄 Sistema de eventos ya cargado');
+        return;
+      }
+      window.KAMASEX_EVENT_SYSTEM_LOADED = true;
+      
+      // 🎯 FUNCIÓN DE VERIFICACIÓN ROBUSTA
+      function checkCartAvailability() {
+        const checks = {
+          CartAPI: typeof window.CartAPI !== 'undefined',
+          addToCart: typeof window.addToCart === 'function',
+          CartManager: typeof window.CartManager !== 'undefined',
+          updateCartCounter: typeof window.updateCartCounter === 'function'
+        };
+        
+        // Necesitamos al menos CartAPI O addToCart
+        const isAvailable = checks.CartAPI || checks.addToCart;
+        
+        if (isAvailable) {
+          console.log('✅ Sistema de carrito verificado:', checks);
+        }
+        
+        return isAvailable;
+      }
+      
+      // 🎯 DISPATCHER DE EVENTOS
+      function dispatchCartReady() {
+        console.log('📡 Disparando evento cart-ready...');
+        
+        // Evento personalizado con detalles
+        const cartReadyEvent = new CustomEvent('cart-ready', {
+          detail: {
+            timestamp: Date.now(),
+            cartAPI: !!window.CartAPI,
+            addToCart: !!window.addToCart,
+            cartManager: !!window.CartManager
+          }
+        });
+        
+        window.dispatchEvent(cartReadyEvent);
+        
+        // También disparar eventos compatibles
+        window.dispatchEvent(new CustomEvent('cart-system-ready'));
+        window.dispatchEvent(new CustomEvent('kama-cart-ready'));
+        
+        console.log('✅ Eventos de carrito listo disparados');
+      }
+      
+      // 🎯 FUNCIÓN HELPER GLOBAL
+      window.waitForCart = function(timeout = 10000) {
+        return new Promise((resolve) => {
+          if (checkCartAvailability()) {
+            resolve(true);
+            return;
+          }
+          
+          console.log('⏳ Esperando evento cart-ready...');
+          
+          const timeoutId = setTimeout(() => {
+            console.warn('⚠️ Timeout esperando cart-ready');
+            resolve(false);
+          }, timeout);
+          
+          window.addEventListener('cart-ready', function() {
+            clearTimeout(timeoutId);
+            resolve(true);
+          }, { once: true });
+        });
+      };
+      
+      // 🎯 FUNCIÓN SAFE ADD TO CART GLOBAL
+      window.safeAddToCart = async function(productId, productName, productPrice, quantity = 1) {
+        const isReady = await window.waitForCart(5000);
+        
+        if (!isReady) {
+          console.error('❌ Carrito no disponible para agregar producto');
+          alert('Error: Sistema de carrito no disponible. Por favor, recarga la página.');
+          return false;
+        }
+        
+        try {
+          // Intentar múltiples métodos
+          if (typeof window.addToCart === 'function') {
+            window.addToCart(productId, productName, productPrice, quantity);
+            return true;
+          } else if (window.CartAPI && typeof window.CartAPI.addProduct === 'function') {
+            return window.CartAPI.addProduct({
+              product_id: productId,
+              product_name: productName,
+              product_price: productPrice,
+              quantity: quantity
+            });
+          } else if (window.CartManager && typeof window.CartManager.addItem === 'function') {
+            return window.CartManager.addItem(productId, productName, productPrice, quantity);
+          }
+          
+          throw new Error('No se encontró método para agregar al carrito');
+          
+        } catch (error) {
+          console.error('❌ Error agregando al carrito:', error);
+          alert('Error agregando al carrito. Por favor, intenta de nuevo.');
+          return false;
+        }
+      };
+      
+      // 🎯 INICIALIZACIÓN INMEDIATA O ESPERA
+      function initializeEventSystem() {
+        if (checkCartAvailability()) {
+          // Cart ya disponible, disparar inmediatamente
+          console.log('✅ Cart disponible inmediatamente');
+          dispatchCartReady();
+        } else {
+          // Esperar a que cart.js se inicialice
+          console.log('⏳ Esperando inicialización de cart.js...');
+          
+          let attempts = 0;
+          const maxAttempts = 100; // 10 segundos max
+          
+          const checkInterval = setInterval(() => {
+            attempts++;
+            
+            if (checkCartAvailability()) {
+              clearInterval(checkInterval);
+              dispatchCartReady();
+            } else if (attempts >= maxAttempts) {
+              clearInterval(checkInterval);
+              console.error('❌ Timeout: cart.js no se inicializó');
+              
+              // Disparar evento de error
+              window.dispatchEvent(new CustomEvent('cart-error', {
+                detail: { error: 'Timeout esperando cart.js' }
+              }));
+            }
+          }, 100);
+        }
+      }
+      
+      // 🎯 EJECUTAR CUANDO DOM ESTÉ LISTO
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeEventSystem);
+      } else {
+        // DOM ya listo, ejecutar inmediatamente
+        initializeEventSystem();
+      }
+      
+    })();
+  </script>
+  
   <!-- Estilos críticos inline -->
   <style>
     *,*::before,*::after{box-sizing:border-box;}
@@ -60,10 +220,19 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     .loading{opacity:0.5;pointer-events:none;}
     .fade-in{animation:fadeIn 0.3s ease-in-out;}
     @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    
+    /* Colores kama: Gris, Rojo, Blanco */
+    :root {
+      --kama-red: #DC2626;
+      --kama-red-hover: #B91C1C;
+      --kama-gray: #6B7280;
+      --kama-dark-gray: #374151;
+      --kama-light-gray: #F3F4F6;
+    }
   </style>
 </head>
 
-<body class="bg-white text-gray-900 antialiased">
+<body class="bg-white text-gray-800 antialiased">
   
   <!-- Header -->
   <Header />
@@ -73,83 +242,35 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <slot />
   </main>
   
+  <!-- Footer -->
   <Footer />
 
-<script src="/js/cart.js" is:inline></script>
+  <!-- ✅ CARRITO GLOBAL - AHORA USA EVENTOS -->
+  <GlobalCart client:load />
 
+  <!-- ✅ VERIFICACIÓN FINAL Y DEBUG -->
   <script>
-
-document.addEventListener('DOMContentLoaded', function() {
-  
-  declare global {
-    interface Window {
-      gtag?: (...args: any[]) => void;
-    }
-  }
-
-  // ✅ SCROLL SUAVE (TYPESCRIPT CORREGIDO)
-  const anchorLinks = document.querySelectorAll('a[href^="#"]');
-  anchorLinks.forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const href = (anchor as HTMLAnchorElement).getAttribute('href');
-      if (href) {
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      }
-    });
-  });
-  
-  // ✅ MANEJO DE ERRORES DE IMÁGENES (TYPESCRIPT CORREGIDO)
-  const images = document.querySelectorAll('img');
-  images.forEach(function(img) {
-    img.addEventListener('error', function(event) {
-      const target = event.target as HTMLImageElement;
-      if (target && target.dataset && !target.dataset.fallbackAttempted) {
-        target.dataset.fallbackAttempted = 'true';
-        target.src = '/images/placeholder-product.jpg';
-      }
-    });
-  });
-  
-  // ✅ LAZY LOADING (TYPESCRIPT CORREGIDO)
-  if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver(function(entries, observer) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          const img = entry.target as HTMLImageElement;
-          const src = img.dataset && img.dataset.src;
-          if (src) {
-            img.src = src;
-            img.classList.remove('loading');
-            img.classList.add('fade-in');
-            observer.unobserve(img);
-          }
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🎉 Layout completamente cargado');
+      
+      // Verificar que el sistema de eventos esté funcionando
+      window.addEventListener('cart-ready', function(event) {
+        console.log('✅ Layout recibió evento cart-ready:', event.detail);
       });
+      
+      window.addEventListener('cart-error', function(event) {
+        console.error('❌ Layout recibió evento cart-error:', event.detail);
+      });
+      
+      // Debug info después de 2 segundos
+      setTimeout(() => {
+        console.log('🐛 DEBUG - Estado final:');
+        console.log('  - waitForCart:', typeof window.waitForCart);
+        console.log('  - safeAddToCart:', typeof window.safeAddToCart);
+        console.log('  - CartAPI:', typeof window.CartAPI);
+        console.log('  - addToCart:', typeof window.addToCart);
+      }, 2000);
     });
-
-    const lazyImages = document.querySelectorAll('img[data-src]');
-    lazyImages.forEach(function(img) {
-      imageObserver.observe(img);
-    });
-  }
-
-  // ✅ ANALYTICS (TYPESCRIPT CORREGIDO)
-  if (typeof window !== 'undefined') {
-    // Configurar Google Analytics si está disponible
-    if (window.gtag) {
-      window.gtag('config', 'GA_MEASUREMENT_ID');
-    }
-  }
-
-  console.log('✅ Layout inicializado correctamente');
-});
   </script>
 </body>
 </html>

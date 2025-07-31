@@ -1,0 +1,171 @@
+/* src/styles/unified-products.css - ESTILOS PARA SISTEMA UNIFICADO */
+
+/* 🔳 GRID SYSTEM PERFECTAMENTE CUADRADO */
+.unified-product-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Grid responsivo con aspecto cuadrado garantizado */
+.unified-product-grid.cols-1 { grid-template-columns: repeat(1, 1fr); }
+.unified-product-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.unified-product-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.unified-product-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.unified-product-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.unified-product-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+/* 🔳 TARJETAS PERFECTAMENTE CUADRADAS */
+.unified-product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.unified-product-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* 🔳 IMAGEN CUADRADA PERFECTA */
+.unified-product-image {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #f9fafb;
+}
+
+.unified-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.unified-product-card:hover .unified-product-image img {
+  transform: scale(1.05);
+}
+
+/* 🎛️ FILTROS UNIFICADOS */
+.unified-filters {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.unified-filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.unified-filters-toggle:hover {
+  background-color: #f9fafb;
+}
+
+/* 📱 RESPONSIVE ADJUSTMENTS */
+@media (max-width: 640px) {
+  .unified-product-grid {
+    gap: 1rem;
+  }
+  
+  .unified-filters {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .unified-product-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .unified-product-grid {
+    gap: 2rem;
+  }
+}
+
+/* 🔳 ASPECT RATIO FALLBACK para navegadores más antiguos */
+@supports not (aspect-ratio: 1 / 1) {
+  .unified-product-image::before {
+    content: "";
+    display: block;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+  }
+  
+  .unified-product-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+/* 🎯 UTILITIES ESPECÍFICAS */
+.product-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+}
+
+.quick-add-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.unified-product-card:hover .quick-add-overlay {
+  opacity: 1;
+}
+
+/* 📄 PAGINACIÓN UNIFICADA */
+.unified-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+}
+
+.unified-pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.unified-pagination button:hover:not(:disabled) {
+  background-color: #f9fafb;
+}
+
+.unified-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.unified-pagination button.active {
+  background-color: #111827;
+  color: white;
+  border-color: #111827;
+}
