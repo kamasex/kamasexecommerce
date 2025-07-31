@@ -47,7 +47,7 @@ export function UnifiedProductGrid({
     const tabletClass = `md:grid-cols-${tablet}`;
     const desktopClass = `lg:grid-cols-${desktop}`;
     
-    return `grid ${mobileClass} ${tabletClass} ${desktopClass} gap-6`;
+    return `grid ${mobileClass} ${tabletClass} ${desktopClass} gap-1`;
   };
 
   // Paginación
@@ -64,7 +64,7 @@ export function UnifiedProductGrid({
 
   return (
     <section className={`py-12 ${className}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-2 lg:px-2">
         
         {/* 📝 HEADER */}
         {(title || subtitle) && (

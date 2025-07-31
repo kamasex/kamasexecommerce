@@ -1,23 +1,391 @@
 ---
+// src/pages/productos.astro - VERSIÓN OPTIMIZADA SIN DELAYS
 import Layout from '../components/layout/Layout.astro';
-import { UnifiedProductGrid } from '../components/react/ProductGrid';
-import { getProducts } from '../lib/supabase';
+import { getProducts, getCategories } from '../lib/supabase';
 
-const products = await getProducts();
+// Obtener datos del servidor
+const [products, categories] = await Promise.all([
+  getProducts(),
+  getCategories()
+]);
+
+const pageTitle = 'Productos - Kamasex.shop';
+const pageDescription = 'Descubre nuestra colección completa de productos de bienestar íntimo con diseño minimalista y envío discreto.';
 ---
 
-<Layout title="Productos - Kamasex.shop">
-  <UnifiedProductGrid
-    products={products}
-    variant="catalog"
-    title="Nuestros Productos"
-    subtitle="Explora nuestra completa colección de productos para tu bienestar íntimo"
-    showFilters={true}
-    showSearch={true}
-    showSort={true}
-    showPagination={true}
-    itemsPerPage={16}
-    columns={{ mobile: 1, tablet: 2, desktop: 3 }}
-    client:load
-  />
+<Layout title={pageTitle} description={pageDescription}>
+  
+  <!-- Hero Section Minimalista -->
+  <section class="bg-white border-b border-gray-200">
+    <div class="container mx-auto px-4 py-12 text-center">
+      <h1 class="text-4xl md:text-5xl font-light text-gray-900 mb-4 tracking-wide">
+        Nuestra Colección
+      </h1>
+      <p class="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+        Productos cuidadosamente seleccionados para tu bienestar y confianza
+      </p>
+    </div>
+  </section>
+
+  <!-- Filtros Optimizados -->
+  <section class="bg-white border-b border-gray-100">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- Categorías -->
+        <div class="flex flex-wrap items-center gap-1">
+          <button 
+            class="filter-btn px-3 py-2 text-xs border border-gray-300 bg-white hover:border-black hover:bg-black hover:text-white transition-all duration-150 active"
+            data-category="all"
+          >
+            Todos
+          </button>
+          {categories.map(category => (
+            <button 
+              class="filter-btn px-3 py-2 text-xs border border-gray-300 bg-white hover:border-black hover:bg-black hover:text-white transition-all duration-150"
+              data-category={category.slug}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+
+        <!-- Búsqueda Simple -->
+        <div class="relative">
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Buscar..."
+            class="w-48 px-3 py-2 text-sm border border-gray-300 focus:border-black focus:outline-none transition-colors duration-150"
+          />
+          <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grid de Productos OPTIMIZADO -->
+  <main class="container mx-auto px-4 py-8">
+    
+    <!-- Contador de resultados -->
+    <div class="mb-4 text-center">
+      <span id="results-count" class="inline-block px-3 py-1 bg-gray-50 border border-gray-200 text-gray-700 text-xs rounded">
+        {products.length} productos
+      </span>
+    </div>
+
+    <!-- Grid Container -->
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-4 gap-0">
+      {products.map(product => (
+        <article class="product-card bg-white border border-gray-200 overflow-hidden hover:border-black hover:shadow-md transition-all duration-200 group">
+          
+          <!-- Imagen clickeable -->
+          <div 
+            class="aspect-square bg-gray-50 overflow-hidden cursor-pointer"
+            onclick={`window.location.href='/producto/${product.slug}'`}
+          >
+            {product.image_url ? (
+              <img 
+                src={product.image_url} 
+                alt={product.name} 
+                class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-300" 
+                loading="lazy"
+              />
+            ) : (
+              <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+            )}
+            
+            <!-- Overlay de hover -->
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <button 
+                class="bg-white text-black px-3 py-1 text-xs font-medium hover:bg-gray-100 transition-colors"
+                onclick={`event.stopPropagation(); window.dispatchEvent(new CustomEvent('add-to-cart', { detail: { product: ${JSON.stringify({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image_url,
+                  category: product.category,
+                  slug: product.slug
+                })}, quantity: 1 } }))`}
+              >
+                AGREGAR
+              </button>
+            </div>
+          </div>
+
+          <!-- Info del producto -->
+          <div class="p-3">
+            <h3 
+              class="font-medium text-gray-900 text-sm line-clamp-1 cursor-pointer hover:text-gray-600 transition-colors"
+              onclick={`window.location.href='/producto/${product.slug}'`}
+            >
+              {product.name}
+            </h3>
+            <p class="text-black font-semibold text-base mt-1">
+              ${product.price.toLocaleString('es-CO')}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <!-- Estado sin resultados -->
+    <div id="no-results" class="hidden text-center py-12">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-800 mb-2">Sin resultados</h3>
+      <p class="text-gray-500 mb-4">No encontramos productos que coincidan con tu búsqueda</p>
+      <button 
+        onclick="clearFilters()"
+        class="border border-gray-300 px-4 py-2 text-gray-700 hover:border-black hover:bg-black hover:text-white transition-all text-sm"
+      >
+        Ver todos los productos
+      </button>
+    </div>
+  </main>
 </Layout>
+
+<!-- Datos para JavaScript -->
+<script type="application/json" id="products-data" set:html={JSON.stringify(products)}></script>
+<script type="application/json" id="categories-data" set:html={JSON.stringify(categories)}></script>
+
+<!-- JavaScript OPTIMIZADO sin delays -->
+<script is:inline>
+(function() {
+  console.log('🚀 Iniciando sistema de productos optimizado...');
+  
+  let allProducts = [];
+  let currentCategory = 'all';
+  let currentSearch = '';
+
+  // Cargar datos
+  function loadData() {
+    try {
+      const productsElement = document.getElementById('products-data');
+      if (productsElement) {
+        allProducts = JSON.parse(productsElement.textContent || '[]');
+        console.log(`✅ ${allProducts.length} productos cargados`);
+      }
+    } catch (error) {
+      console.error('Error cargando datos:', error);
+    }
+  }
+
+  // Filtrar productos (SIN DELAYS)
+  function filterProducts() {
+    const filtered = allProducts.filter(product => {
+      const categoryMatch = currentCategory === 'all' || 
+                           product.category?.toLowerCase() === currentCategory.toLowerCase();
+      
+      const searchMatch = currentSearch === '' || 
+                         product.name.toLowerCase().includes(currentSearch.toLowerCase());
+      
+      return categoryMatch && searchMatch && product.is_active;
+    });
+
+    renderProducts(filtered);
+    updateResultsCount(filtered.length);
+    updateFiltersUI();
+  }
+
+  // Renderizar productos (VANILLA JS PURO - MÁS RÁPIDO)
+  function renderProducts(products) {
+    const grid = document.getElementById('products-grid');
+    const noResults = document.getElementById('no-results');
+    
+    if (!grid) return;
+
+    if (products.length === 0) {
+      grid.style.display = 'none';
+      noResults.classList.remove('hidden');
+      return;
+    }
+
+    grid.style.display = 'grid';
+    noResults.classList.add('hidden');
+
+    // Render directo en DOM (más rápido que React)
+    grid.innerHTML = products.map(product => `
+      <article class="product-card bg-white border border-gray-200 overflow-hidden hover:border-black hover:shadow-md transition-all duration-200 group">
+        <div 
+          class="aspect-square bg-gray-50 overflow-hidden cursor-pointer relative"
+          onclick="window.location.href='/producto/${product.slug}'"
+        >
+          ${product.image_url ? 
+            `<img 
+              src="${product.image_url}" 
+              alt="${product.name}" 
+              class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-300" 
+              loading="lazy"
+            />` :
+            `<div class="w-full h-full flex items-center justify-center bg-gray-100">
+              <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"></path>
+              </svg>
+            </div>`
+          }
+          
+          <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <button 
+              class="bg-white text-black px-3 py-1 text-xs font-medium hover:bg-gray-100 transition-colors"
+              onclick="event.stopPropagation(); addToCartFromGrid('${product.id}', '${product.name}', ${product.price}, '${product.image_url || ''}', '${product.category || ''}', '${product.slug}')"
+            >
+              AGREGAR
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3">
+          <h3 
+            class="font-medium text-gray-900 text-sm line-clamp-1 cursor-pointer hover:text-gray-600 transition-colors"
+            onclick="window.location.href='/producto/${product.slug}'"
+          >
+            ${product.name}
+          </h3>
+          <p class="text-black font-semibold text-base mt-1">
+            $${product.price.toLocaleString('es-CO')}
+          </p>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  // Agregar al carrito desde grid
+  window.addToCartFromGrid = function(id, name, price, image, category, slug) {
+    const product = { id, name, price, image, category, slug };
+    window.dispatchEvent(new CustomEvent('add-to-cart', {
+      detail: { product, quantity: 1 }
+    }));
+  };
+
+  // Actualizar contador
+  function updateResultsCount(count) {
+    const counter = document.getElementById('results-count');
+    if (counter) {
+      counter.textContent = `${count} producto${count !== 1 ? 's' : ''}`;
+    }
+  }
+
+  // Actualizar UI de filtros
+  function updateFiltersUI() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      const category = btn.getAttribute('data-category');
+      if (category === currentCategory) {
+        btn.classList.add('bg-black', 'text-white', 'border-black');
+        btn.classList.remove('bg-white', 'text-gray-700');
+      } else {
+        btn.classList.remove('bg-black', 'text-white', 'border-black');
+        btn.classList.add('bg-white', 'text-gray-700');
+      }
+    });
+  }
+
+  // Event listeners OPTIMIZADOS
+  function setupEvents() {
+    // Filtros de categoría
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        currentCategory = e.target.getAttribute('data-category') || 'all';
+        filterProducts(); // SIN DELAY
+      });
+    });
+
+    // Búsqueda con debounce MÁS CORTO
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          currentSearch = e.target.value.trim();
+          filterProducts(); // SIN DELAY
+        }, 150); // 150ms en lugar de 300ms
+      });
+    }
+  }
+
+  // Limpiar filtros
+  window.clearFilters = function() {
+    currentCategory = 'all';
+    currentSearch = '';
+    
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+    
+    filterProducts(); // SIN DELAY
+  };
+
+  // Inicializar INMEDIATAMENTE
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      setupEvents();
+      filterProducts();
+    });
+  } else {
+    loadData();
+    setupEvents();
+    filterProducts();
+  }
+
+  console.log('✅ Sistema optimizado cargado');
+})();
+</script>
+
+<style>
+  /* Estilos OPTIMIZADOS */
+  .product-card {
+    will-change: transform, box-shadow;
+  }
+  
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Grid optimizado */
+  #products-grid {
+    gap: 0.75rem; /* 12px - GAP MENOR */
+  }
+
+  @media (min-width: 640px) {
+    #products-grid {
+      gap: 0.75rem; /* Mantener gap pequeño */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    #products-grid {
+      gap: 0; /* 16px en desktop */
+    }
+  }
+
+  /* Transiciones más rápidas */
+  .filter-btn {
+    transition: all 150ms ease;
+  }
+
+  .product-card {
+    transition: all 200ms ease;
+  }
+
+  .product-card img {
+    transition: all 300ms ease;
+  }
+
+  /* Optimizaciones de rendimiento */
+  .product-card:hover {
+    transform: translateZ(0); /* Force GPU acceleration */
+  }
+</style>

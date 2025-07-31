@@ -1,16 +1,57 @@
-# netlify.toml - SOLO BUILD ESTÁTICO
 [build]
   publish = "dist"
   command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
+  # Variables críticas para el build
+  PUBLIC_SUPABASE_URL = ""
+  PUBLIC_SUPABASE_ANON_KEY = ""
 
+# Redirects para tus rutas específicas de Kamasex
+[[redirects]]
+  from = "/productos/:slug"
+  to = "/productos/:slug"
+  status = 200
+
+[[redirects]]
+  from = "/categoria/:categoria"
+  to = "/categoria/:categoria"
+  status = 200
+
+# API routes (si tienes)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Páginas principales
+[[redirects]]
+  from = "/carrito"
+  to = "/carrito/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/checkout"
+  to = "/checkout/index.html"  
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200
+
+# Fallback 404 personalizado
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Headers para performance
 [[headers]]
-  for = "/*"
+  for = "/_astro/*"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/images/*"

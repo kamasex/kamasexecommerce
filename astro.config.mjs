@@ -12,7 +12,7 @@ export default defineConfig({
   output: 'static',  // ✅ Estático para Netlify
   // adapter: node(),  // ✅ Comentado
   
-  site: 'https://kamasex.shop',
+  site: 'https://mueblesmartek.com',
   vite: {
     optimizeDeps: {
       include: ['@supabase/supabase-js']
